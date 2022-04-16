@@ -1,8 +1,10 @@
 # Imagine2022-Backend
+
 Imagine, nay, CONSIDER RIT
 
 ## Endpoints
-`https://imagine-2022-backend-git-imagine2022-backend.apps.okd4.csh.rit.edu/beacons/locations` - Gets beacon locations most recently
+
+`GET https://imagine-2022-backend-git-imagine2022-backend.apps.okd4.csh.rit.edu/beacons/locations` - Gets beacon locations most recently
 
 ```json
 {
@@ -22,4 +24,8 @@ Imagine, nay, CONSIDER RIT
 }
 ```
 
-`https://imagine-2022-backend-git-imagine2022-backend.apps.okd4.csh.rit.edu/config/zero` - Gets lat/lon of (0, 0) on campus. Returns list of `[lat, lon]`
+`GET https://imagine-2022-backend-git-imagine2022-backend.apps.okd4.csh.rit.edu/config/zero` - Gets lat/lon of (0, 0) on campus. Returns list of `[lat, lon]`
+
+`POST https://imagine-2022-backend-git-imagine2022-backend.apps.okd4.csh.rit.edu/esp?id=<mac_address>&lat=<latitude>&lon=<longitude>` - Adds a new sniffer with mac address `id` at `(lat, lon)`.
+
+`POST https://imagine-2022-backend-git-imagine2022-backend.apps.okd4.csh.rit.edu/remove/esp?id=<mac_address>` - Removes sniffer with mac address `id`.

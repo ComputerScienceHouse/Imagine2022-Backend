@@ -3,6 +3,7 @@ from geopy.distance import geodesic
 from triangulator import geo_triangulate, LatLong
 import math
 import logging
+import json
 
 
 class Triangulator:
@@ -169,7 +170,7 @@ class Triangulator:
 
         for b in findable_beacons.keys():
             findable_beacons[b]["position"], findable_beacons[b]["absolute_position"] = self._calc_position(
-                findable_beacons[b], 2.5
+                findable_beacons[b], bounds / 2.5
             )
 
         return findable_beacons

@@ -131,3 +131,4 @@ dmypy.json
 out.json
 test_params.json
 _run.sh
+_run_prod.sh

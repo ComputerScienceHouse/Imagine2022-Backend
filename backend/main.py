@@ -45,11 +45,12 @@ triangulator = Triangulator(
 
 _ovr = os.environ.get("TRIANGULATION_TIMESTAMP_OVERRIDE", default="no")
 TIME_OVERRIDE: float = float(_ovr) if _ovr != "no" else False
+INTERVAL: float = float(os.environ.get("TRIANGULATION_INTERVAL"))
 
 @app.on_event("startup")
-@repeat_every(seconds=5)
+@repeat_every(seconds=INTERVAL)
 def update_beacon_positions():
-    triangulator.run_once(TIME_OVERRIDE if TIME_OVERRIDE else (time.time() - 2.5), bounds=2.5)
+    triangulator.run_once(TIME_OVERRIDE if TIME_OVERRIDE else (time.time() - (INTERVAL / 2)), bounds=INTERVAL / 2)
 
 @app.get("/beacons/locations", status_code=200)
 async def get_beacons():

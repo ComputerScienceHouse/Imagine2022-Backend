@@ -64,6 +64,7 @@ db.sqlite3-journal
 # Flask stuff:
 instance/
 .webassets-cache
+config.py
 
 # Scrapy stuff:
 .scrapy
@@ -131,4 +132,3 @@ dmypy.json
 out.json
 test_params.json
 _run.sh
-_run_prod.sh

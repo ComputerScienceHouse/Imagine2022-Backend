@@ -36,7 +36,7 @@ Guess what? It's in Flask now.
 `POST /esp?id=<mac_address>&lat=<latitude>&lon=<longitude>` - Adds a new sniffer with mac address `id` at `(lat, lon)`.
 
 ```
-## HTTP Status Codes
+HTTP Status Codes
 
 200 - Successfully added ESP
 400 - Missing Parameters 
@@ -56,7 +56,7 @@ HTTP Status Codes
 ```
 HTTP Status Codes
 
-200 - Successfully removed ESP
+200 - Successfully hid ESP
 400 - Missing Parameter
 ```
 
@@ -65,6 +65,6 @@ HTTP Status Codes
 ```
 HTTP Status Codes
 
-200 - Successfully removed ESP
+200 - Successfully unhid ESP
 400 - Missing Parameter
 ```

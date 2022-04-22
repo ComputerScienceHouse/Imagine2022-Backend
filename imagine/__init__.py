@@ -152,4 +152,18 @@ def update_constant():
         triangulator.run_once(TIME_OVERRIDE if TIME_OVERRIDE else (time.time() - 2.5), bounds=2.5)
         time.sleep(5)
 
+def delete_old():
+    while True:
+        current = time.time()
+        outputs = output.find()
+        for res in outputs:
+            max_time = -1
+            for esp in res["esps"]:
+                if res["esps"][esp]["timestamp"] > max_time:
+                    max_time = res["esps"][esp]["timestamp"]
+            if current - max_time > 300:
+                output.delete_one({"beacon_id": res["beacon_id"]})
+        time.sleep(5)
+
 start_new_thread(update_constant, ())
+start_new_thread(delete_old, ())

@@ -4,6 +4,7 @@ from imagine.triangulator import geo_triangulate, LatLong
 import math
 import logging
 import json
+import sys
 
 
 class Triangulator:
@@ -103,11 +104,11 @@ class Triangulator:
                 beacons[frame["macaddr"]]["esps"][str(frame["sniffaddr"])] = {
                     "timestamp": frame["timestamp"],
                     "rssi": frame["rssi"],
-                    "esp_position": self.esps[frame["sniffaddr"]],
+                    "esp_position": self.esps[frame["sniffaddr"].lower()],
                     "esp_position_normal": self._get_normalized_point(
-                        *self.esps[frame["sniffaddr"]]
+                        *self.esps[frame["sniffaddr"].lower()]
                     ),
-                    "distance": self._calc_distance(frame["rssi"]),
+                    "distance": self._calc_distance(float(frame["rssi"])),
                 }
 
         findable_beacons = {}
@@ -167,7 +168,6 @@ class Triangulator:
 
     def aggregate(self, timestamp: float, bounds: float = 5):
         findable_beacons = self._get_findable_beacons(timestamp, bounds)
-
         for b in findable_beacons.keys():
             findable_beacons[b]["position"], findable_beacons[b]["absolute_position"] = self._calc_position(
                 findable_beacons[b], bounds / 2.5

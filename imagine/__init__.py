@@ -50,8 +50,8 @@ heartbeats: Collection = mongo[app.config["MONGO_DB"]][
 ]
 
 triangulator = Triangulator(
-    app.config["TRIANGULATION_ENV_FACTOR"],
-    app.config["TRIANGULATION_ONE_METER_RSSI"],
+    float(app.config["TRIANGULATION_ENV_FACTOR"]),
+    float(app.config["TRIANGULATION_ONE_METER_RSSI"]),
     [float(i) for i in app.config["TRIANGULATION_ZERO"].split(",")],
     mongo_client=mongo,
     mongo_database=app.config["MONGO_DB"],

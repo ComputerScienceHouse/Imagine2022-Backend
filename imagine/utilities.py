@@ -169,12 +169,9 @@ class Triangulator:
     def aggregate(self, timestamp: float, bounds: float = 5):
         findable_beacons = self._get_findable_beacons(timestamp, bounds)
         for b in findable_beacons.keys():
-            try:
-                findable_beacons[b]["position"], findable_beacons[b]["absolute_position"] = self._calc_position(
-                    findable_beacons[b], bounds / 2.5
-                )
-            except TypeError:
-                pass
+            findable_beacons[b]["position"], findable_beacons[b]["absolute_position"] = self._calc_position(
+                findable_beacons[b], bounds / 2.5
+            )
 
         return findable_beacons
     

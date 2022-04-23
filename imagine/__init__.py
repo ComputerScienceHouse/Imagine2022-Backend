@@ -9,6 +9,7 @@ import time
 import datetime
 import pytz
 from _thread import *
+import sys
 
 app = Flask(__name__)
 auth = HTTPTokenAuth(scheme='Bearer')
@@ -149,7 +150,10 @@ def unhide_beacon():
 
 def update_constant():
     while True:
-        triangulator.run_once(TIME_OVERRIDE if TIME_OVERRIDE else (time.time() - 2.5), bounds=2.5)
+        try:
+            triangulator.run_once(TIME_OVERRIDE if TIME_OVERRIDE else (time.time() - 2.5), bounds=2.5)
+        except Exception as e:
+            print(f"Error in Update Loop: {e}", file=sys.stderr)
         time.sleep(5)
 
 start_new_thread(update_constant, ())

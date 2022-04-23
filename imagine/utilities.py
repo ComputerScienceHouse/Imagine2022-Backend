@@ -107,7 +107,7 @@ class Triangulator:
                     "rssi": frame["rssi"],
                     "esp_position": self.esps()[frame["sniffaddr"].lower()],
                     "esp_position_normal": self._get_normalized_point(
-                        *self.esps[frame["sniffaddr"].lower()]
+                        *self.esps()[frame["sniffaddr"].lower()]
                     ),
                     "distance": self._calc_distance(float(frame["rssi"])),
                 }

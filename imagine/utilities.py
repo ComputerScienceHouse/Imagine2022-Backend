@@ -43,10 +43,6 @@ class Triangulator:
         self.esp_collection = self.database[mongo_esp_collection]
         self.output_collection = self.database[mongo_output_collection]
 
-        self.esps = {
-            i["id"]: i["position"] for i in self.esp_collection.find(filter={})
-        }
-
         self.lat_con = geodesic(
             zero_zero,
             [
@@ -63,6 +59,11 @@ class Triangulator:
         ).meters
 
         self.test = test
+
+    def esps(self):
+        return {
+            i["id"]: i["position"] for i in self.esp_collection.find(filter={})
+        }
 
     def _calc_distance(self, rssi):
         return 10 ** ((self.MEASURED_VALUE - rssi) / (10 * self.N))
@@ -104,7 +105,7 @@ class Triangulator:
                 beacons[frame["macaddr"]]["esps"][str(frame["sniffaddr"])] = {
                     "timestamp": frame["timestamp"],
                     "rssi": frame["rssi"],
-                    "esp_position": self.esps[frame["sniffaddr"].lower()],
+                    "esp_position": self.esps()[frame["sniffaddr"].lower()],
                     "esp_position_normal": self._get_normalized_point(
                         *self.esps[frame["sniffaddr"].lower()]
                     ),

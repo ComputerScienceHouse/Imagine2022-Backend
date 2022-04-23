@@ -104,8 +104,9 @@ def get_heartbeats():
         else:
             out[addr] = i["timestamp"]
     for key in out:
+        is_ok = time.time()-out[key] < 60
         timestamp = datetime.datetime.fromtimestamp(out[key]-14400)
-        out[key] = timestamp.strftime("%m/%d/%Y %H:%M:%S")
+        out[key] = {"time":timestamp.strftime("%m/%d/%Y %H:%M:%S"),"ok":is_ok}
     return out
 
 # @app.route("/config/zero", methods=['GET'])

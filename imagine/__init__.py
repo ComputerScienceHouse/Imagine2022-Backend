@@ -1,17 +1,19 @@
+import _thread
+import datetime
+import os
+import sys
+import time
+import traceback
 from inspect import trace
+
+import pytz
 from flask import Flask, abort, request
 from flask_cors import CORS
 from flask_httpauth import HTTPTokenAuth
-import os
 from pymongo import MongoClient
 from pymongo.collection import Collection
+
 from imagine.utilities import Triangulator
-import time
-import datetime
-import pytz
-from _thread import *
-import sys
-import traceback
 
 app = Flask(__name__)
 auth = HTTPTokenAuth(scheme='Bearer')
@@ -70,6 +72,7 @@ TIME_OVERRIDE: float = float(_ovr) if _ovr != "no" else False
 def verify_token(token):
     if token in tokens:
         return tokens[token]
+    return None
 
 @app.route('/beacons/locations', methods=['GET'])
 def locations():
@@ -78,21 +81,16 @@ def locations():
     for i in res:
         beacon_id = i["beacon_id"]
         beacon_find = beacons.find({"id": beacon_id})
-        beacon_hidden = True
-        for bool in beacon_find:
-            if not bool["hidden"]:
-                beacon_hidden = False
-                break
-        if not beacon_hidden:
+        if any(map(lambda find: not find["hidden"], beacon_find)):
             out[beacon_id] = {k: v for k, v in i.items() if not k in ["_id", "testpos"]}
     return out
 
 @app.route('/beacons/heartbeat', methods=['GET'])
 def get_heartbeats():
     args = request.args
-    id = args.get("id")
-    if id:
-        res = heartbeats.find({"sniffaddr": id})
+    beacon_id = args.get("id")
+    if beacon_id:
+        res = heartbeats.find({"sniffaddr": beacon_id})
     else:
         res = heartbeats.find()
     out = {}
@@ -103,10 +101,10 @@ def get_heartbeats():
                 out[addr] = i["timestamp"]
         else:
             out[addr] = i["timestamp"]
-    for key in out:
-        timestamp = datetime.datetime.fromtimestamp(out[key]-14400)
-        out[key] = timestamp.strftime("%m/%d/%Y %H:%M:%S")
-    return out
+    return {
+        key: datetime.datetime.fromtimestamp(val-14400).strftime("%m/%d/%Y %H:%M:%S")
+        for key, val in out
+    }
 
 # @app.route("/config/zero", methods=['GET'])
 # def get_zero():
@@ -116,20 +114,20 @@ def get_heartbeats():
 @auth.login_required
 def new_esp():
     args = request.args
-    id = args.get("id")
+    esp_id = args.get("id")
     lat = args.get("lat")
     lon = args.get("lon")
-    if not (id and lat and lon):
+    if not (esp_id and lat and lon):
         abort(400)
-    triangulator.add_esp([float(lat), float(lon)], id)
+    triangulator.add_esp([float(lat), float(lon)], esp_id)
     return "OK", 200
 
 @app.route("/remove/esp", methods=['POST'])
 @auth.login_required
 def remove_esp():
     args = request.args
-    id = args.get("id")
-    result = triangulator.remove_esp(id)
+    esp_id = args.get("id")
+    result = triangulator.remove_esp(esp_id)
     if result:
         return "OK", 200
     return "ESP Not Found", 400
@@ -138,25 +136,28 @@ def remove_esp():
 @auth.login_required
 def hide_beacon():
     args = request.args
-    id = args.get("id")
-    beacons.update_one({"id": id}, {"$set": {"hidden": True}})
+    beacon_id = args.get("id")
+    beacons.update_one({"id": beacon_id}, {"$set": {"hidden": True}})
     return "OK", 200
 
 @app.route("/unhide", methods=['POST'])
 @auth.login_required
 def unhide_beacon():
     args = request.args
-    id = args.get("id")
-    beacons.update_one({"id": id}, {"$set": {"hidden": False}})
+    beacon_id = args.get("id")
+    beacons.update_one({"id": beacon_id}, {"$set": {"hidden": False}})
     return "OK", 200
 
 def update_constant():
     while True:
         try:
-            triangulator.run_once(TIME_OVERRIDE if TIME_OVERRIDE else (time.time() - 2.5), bounds=2.5)
+            triangulator.run_once(
+                TIME_OVERRIDE if TIME_OVERRIDE else (time.time() - 2.5),
+                bounds=2.5
+            )
             print("Successfull Loop", file=sys.stderr)
-        except Exception as e:
+        except Exception:
             print(f"Error in Update Loop: {traceback.format_exc()}", file=sys.stderr)
         time.sleep(5)
 
-start_new_thread(update_constant, ())
+_thread.start_new_thread(update_constant, ())

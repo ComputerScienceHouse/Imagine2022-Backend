@@ -31,7 +31,7 @@ def normalize_lon(x, a):
     return (x + a) % (2 * a) - a
 
 
-class LatLong(object):
+class LatLong:
     ''' latitude & longitude in degrees & radians.
         Also colatitude in radians.
     '''
@@ -153,7 +153,7 @@ def gc_triangulate(a, ax_dist, b, bx_dist, verbose=0):
     ab_dist, ab_azi = gc_distance_azi(a, b)
     ab_dist_deg = degrees(ab_dist)
     if verbose > 1:
-        print('AB distance: %f\nAB azimuth: %f' % 
+        print('AB distance: %f\nAB azimuth: %f' %
             (ab_dist_deg, degrees(ab_azi)))
 
     # Make sure sides of ABX obey triangle inequality
@@ -256,7 +256,8 @@ def geo_newton(a, b, x, ax_dist, bx_dist, verbose=0):
 
         if (almost_equal(delta_f, 0, distance_tol) and
             almost_equal(delta_g, 0, distance_tol)):
-            if verbose and i > 9: print('Loops =', i)
+            if verbose and i > 9:
+                print('Loops =', i)
             break
 
         # Calculate partial derivatives of f & g

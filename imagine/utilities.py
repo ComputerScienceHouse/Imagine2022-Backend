@@ -1,18 +1,19 @@
+import math
 from pymongo import MongoClient
 from geopy.distance import geodesic
 from imagine.triangulator import geo_triangulate, LatLong
-import math
 import logging
-import json
-import sys
 
 
 class Triangulator:
     def __init__(
         self,
-        environmental_value: float,  # Environmental factor of RIT (should be between 2 and 5 i think, but we can derive it later)
+        environmental_value: float,  # Environmental factor of RIT (should be
+                                     # between 2 and 5 i think, but we can
+                                     # derive it later)
         one_meter_rssi: float,  # RSSI of a beacon one meter from an ESP
-        zero_zero: list[float],  # lat/lon position of (0, 0) to use as normalization
+        zero_zero: list[float],  # lat/lon position of (0, 0) to use as
+                                 # normalization
         mongo_client: MongoClient = None,
         mongo_host: str = "mongodb://tide.csh.rit.edu",  # MongoDB host
         mongo_user: str = None,  # MongoDB user
@@ -72,7 +73,7 @@ class Triangulator:
         return (lat - self.zero_zero[0]) * self.lat_con, (
             lon - self.zero_zero[1]
         ) * self.lon_con
-    
+
     def _get_unnormalized_point(self, lat: float, lon: float) -> list[float]:
         return lat / self.lat_con + self.zero_zero[0], lon / self.lon_con + self.zero_zero[1]
 
@@ -91,7 +92,9 @@ class Triangulator:
                     else None,
                 }
 
-            if (  # Giant condition to check if the new frame is more recent than an old one, if an old one exists
+            # Giant condition to check if the new frame is more recent than an
+            # old one, if an old one exists
+            if (
                 frame["sniffaddr"] in beacons[frame["macaddr"]]["esps"].keys()
                 and beacons[frame["macaddr"]]["esps"][frame["sniffaddr"]]["timestamp"]
                 < frame["timestamp"]
@@ -175,7 +178,7 @@ class Triangulator:
             )
 
         return findable_beacons
-    
+
     def run_once(self, timestamp: float, bounds: float = 5):
         beacons = self.aggregate(timestamp, bounds=bounds)
         for b in beacons.keys():
@@ -187,10 +190,10 @@ class Triangulator:
                 logging.exception("Error in triangulation upload")
                 return False
         return True
-    
+
     def add_esp(self, pos, id):
         self.esp_collection.insert_one({"id": id, "position": pos})
-        
+
     def remove_esp(self, id):
         result = self.esp_collection.delete_one({"id": id})
         return result.deleted_count == 1

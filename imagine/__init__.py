@@ -156,8 +156,7 @@ def update_constant():
             triangulator.run_once(TIME_OVERRIDE if TIME_OVERRIDE else (time.time() - 2.5), bounds=2.5)
             print("Successfull Loop", file=sys.stderr)
         except Exception as e:
-            print(f"Error in Update Loop:", file=sys.stderr)
-            traceback.print_exception(e, file=sys.stderr)
+            print(f"Error in Update Loop: {traceback.format_exc()}", file=sys.stderr)
         time.sleep(5)
 
 start_new_thread(update_constant, ())

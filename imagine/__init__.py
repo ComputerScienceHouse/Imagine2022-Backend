@@ -121,6 +121,8 @@ def new_esp():
     lon = args.get("lon")
     if not (id and lat and lon):
         abort(400)
+    if len(list(esps.find({"id":id}))) > 0:
+        abort(400)
     triangulator.add_esp([float(lat), float(lon)], id)
     return "OK", 200
 

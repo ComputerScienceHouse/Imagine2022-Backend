@@ -106,7 +106,7 @@ def get_heartbeats():
     for key in out:
         is_ok = time.time()-out[key] < 60
         timestamp = datetime.datetime.fromtimestamp(out[key]-14400)
-        out[key] = {"time":timestamp.strftime("%m/%d/%Y %H:%M:%S"),"ok":is_ok}
+        out[key] = {"time":timestamp.strftime("%m/%d/%Y %H:%M:%S"),"ok":is_ok, "decimal":int(key[-2:], 16)}
     return out
 
 # @app.route("/config/zero", methods=['GET'])
